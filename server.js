@@ -10,16 +10,11 @@ app.use(express.json());
 
 // PRODUCTION-READY CORS CONFIGURATION
 app.use(cors({
-  origin: [
-    'https://www.bluroyalrides.com',
-    'https://bluroyalrides.com', 
-    'https://djblubloods.wixsite.com/blu-royal-rides',
-    'https://blu-royal-rides.com',
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'file://',
-    null
-  ],
+  origin: true,
+  credentials: true,
+  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
+  allowedHeaders: ['*']
+}));
   credentials: true,
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
