@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cors = require('cors');
 const Stripe = require('stripe');
@@ -8,33 +7,30 @@ require('dotenv').config();
 const app = express();
 app.use(express.json());
 
-// PRODUCTION-READY CORS CONFIGURATION
+// ULTRA-PERMISSIVE CORS CONFIGURATION
 app.use(cors({
   origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
   allowedHeaders: ['*']
 }));
-  credentials: true,
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
 
 // Handle preflight OPTIONS requests
 app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin);
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+  res.header('Access-Control-Allow-Headers', '*');
   res.header('Access-Control-Allow-Credentials', 'true');
   res.sendStatus(200);
 });
+
 // REQUEST LOGGING
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path} - ${req.ip}`);
   next();
 });
 
-// Initialize Stripe with secret key
+// Initialize Stripe with secret key and fallback
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_51RigOrH5fnESKVai99NcFyaKX47FRbsV6rsApZT0B2HS6FkYn7z005RaTgeMN15ooNyM7veu4RC5O3lwogzJqVfe00xYb4wEwY');
 
 // Initialize Database
@@ -59,6 +55,8 @@ app.post('/create-payment-intent', async (req, res) => {
       bookingDetails 
     } = req.body;
 
+    console.log('Creating payment intent for:', customerEmail, 'Amount:', amount);
+
     // Create a PaymentIntent with more metadata
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100), // Convert to cents
@@ -70,6 +68,8 @@ app.post('/create-payment-intent', async (req, res) => {
       },
       receipt_email: customerEmail
     });
+
+    console.log('Payment intent created:', paymentIntent.id);
 
     // Save booking to database
     await database.saveBooking({
