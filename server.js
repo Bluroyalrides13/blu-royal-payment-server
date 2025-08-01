@@ -32,7 +32,7 @@ app.use((req, res, next) => {
 });
 
 // Initialize Stripe with secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_51RigOrH5fnESKVai99NcFyaKX47FRbsV6rsApZT0B2HS6FkYn7z005RaTgeMN15ooNyM7veu4RC5O3lwogzJqVfe00xYb4wEwY');
 
 // Initialize Database
 const database = new Database();
