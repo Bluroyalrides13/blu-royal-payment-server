@@ -52,15 +52,19 @@ app.post('/create-payment-intent', async (req, res) => {
     const { 
       amount, 
       customerEmail, 
+      paymentMethodId,    // ← ADD THIS LINE
       bookingDetails 
     } = req.body;
 
-    console.log('Creating payment intent for:', customerEmail, 'Amount:', amount);
+    console.log('Creating payment intent for:', customerEmail, 'Amount:', amount, 'PaymentMethod:', paymentMethodId);
 
-    // Create a PaymentIntent with more metadata
+    // Create a PaymentIntent with payment method attached
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100), // Convert to cents
       currency: 'usd',
+      payment_method: paymentMethodId,  // ← ADD THIS LINE
+      confirm: true,                    // ← ADD THIS LINE
+      return_url: 'https://djblubloods.wixsite.com/blu-royal-rides',  // ← ADD THIS LINE
       metadata: {
         customerEmail: customerEmail,
         bookingType: bookingDetails.serviceType,
